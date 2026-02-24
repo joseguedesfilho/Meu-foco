@@ -1,0 +1,5 @@
+{
+  "name": "Meu Foco",
+  "description": "Transforme suas fotos em retratos profissionais com IA.",
+  "requestFramePermissions": ["camera"]
+}
