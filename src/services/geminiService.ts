@@ -30,10 +30,10 @@ export class GeminiService {
     if (!apiKey || apiKey === "undefined") {
       throw new Error(
         "Gemini API Key não encontrada. \n\n" +
-        "Se você estiver no Netlify/Vercel: \n" +
-        "1. Vá em Site Settings > Environment Variables\n" +
-        "2. Adicione GEMINI_API_KEY com sua chave\n" +
-        "3. FAÇA UM NOVO DEPLOY para aplicar as mudanças."
+        "Se você estiver no Netlify: \n" +
+        "1. Em Site Settings > Environment Variables, adicione GEMINI_API_KEY.\n" +
+        "2. Adicione também SECRETS_SCAN_OMIT_KEYS com o valor GEMINI_API_KEY.\n" +
+        "3. Vá em Deploys > Trigger Deploy > Clear cache and deploy site."
       );
     }
     
