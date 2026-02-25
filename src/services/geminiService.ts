@@ -61,11 +61,15 @@ export class GeminiService {
         corporate: "Formal executive style. Dark suits, white or light blue shirts, and a high-end office or neutral grey studio background.",
         linkedin: "Modern professional networking style. Business casual or smart casual attire with a clean, bright, and approachable studio background.",
         profile: "Creative professional style. Modern textures, clean lines, and a minimalist, high-contrast studio background.",
-        fragmentation: "Modern Fragmentation Effect. The face remains 100% intact and clear, but the body and background gracefully fragment into geometric particles, 3D cubes, or digital shards flutuating in the air. High impact, powerful, and evolutionary vibe.",
-        dual_concept: "Creative Duality Effect. Artistically split the image vertically. One side is realistic, the other side is a conceptual masterpiece (e.g., digital futuristic, smoke dissolving, or neon light). Deep, mysterious, and strategic vibe.",
+        fragmentation: "Modern Fragmentation Effect. The face remains 100% intact and clear. The person's body and clothing physically transform and disintegrate into realistic geometric particles, 3D cubes, or digital shards flutuating in the air. This is a physical transformation of the subject, not an overlay. High impact and evolutionary vibe.",
+        half_fragmentation: "Half-Fragmentation Effect. Create a seamless, organic transition from reality to disintegration across the subject. One side remains perfectly realistic. The other side physically dissolves into artistic particles and digital dust. NO harsh vertical lines or visible borders between the two states; the transition must be smooth and blended.",
+        dual_concept: "Creative Duality Effect. Artistically blend two concepts across the image. One side is realistic, the other is a conceptual masterpiece (e.g., digital futuristic, smoke dissolving). The transition between the two sides must be SEAMLESS and organic, with NO harsh dividing lines or visible borders.",
         cinematic_aura: "Cinematic Aura Style. Dark, moody background with dramatic rim lighting. Subtle smoke or fog enveloping the subject. High authority and strong personal brand presence. Cinema-grade color grading.",
         futuristic: "Futuristic Tech Style. Cybernetic accents in the background, neon highlights, and a high-tech laboratory or sci-fi city environment.",
-        minimalist: "Ultra-Minimalist Style. Pure white or deep black background, extremely clean lines, and focus entirely on the subject's silhouette and face."
+        minimalist: "Ultra-Minimalist Style. Pure white or deep black background, extremely clean lines, and focus entirely on the subject's silhouette and face.",
+        cyber_glitch: "Cyber Glitch Art. Apply digital distortion, chromatic aberration, and neon glitch artifacts to the background and clothing. The face remains clear but with subtle digital highlights. High-energy, tech-rebel vibe.",
+        oil_painting: "Classical Oil Painting. Transform the entire image into a masterpiece of oil on canvas. Rich textures, visible brushstrokes, and warm, dramatic lighting like a Renaissance portrait. Maintain the person's likeness perfectly.",
+        sketch_art: "Hand-Drawn Sketch. Convert the portrait into a sophisticated pencil and charcoal sketch. Detailed line work, artistic shading, and a paper texture background. Elegant and timeless artistic feel."
       };
 
       const prompt = `
@@ -131,17 +135,29 @@ export class GeminiService {
     } catch (error: any) {
       console.error("Error processing image with Gemini:", error);
       
-      const errorMessage = error.message || "";
+      let errorMessage = error.message || "";
+      
+      // Try to parse JSON error if message is a JSON string
+      if (typeof errorMessage === 'string' && errorMessage.startsWith('{')) {
+        try {
+          const parsed = JSON.parse(errorMessage);
+          if (parsed.error?.message) {
+            errorMessage = parsed.error.message;
+          }
+        } catch (e) {
+          // Not valid JSON or different structure
+        }
+      }
       
       if (errorMessage.includes("429") || errorMessage.includes("quota") || errorMessage.includes("RESOURCE_EXHAUSTED")) {
-        throw new Error("Limite de uso atingido. O Google permite apenas algumas gerações por minuto no plano gratuito. Por favor, aguarde 1 minuto e tente novamente.");
+        throw new Error("QUOTA_EXCEEDED: Limite de uso atingido. O Google permite apenas algumas gerações por minuto no plano gratuito. Por favor, aguarde 1 minuto e tente novamente.");
       }
       
       if (errorMessage.includes("safety")) {
         throw new Error("A imagem foi bloqueada pelos filtros de segurança. Tente uma foto diferente.");
       }
       
-      throw error;
+      throw new Error(errorMessage || "Ocorreu um erro inesperado ao processar a imagem.");
     }
   }
 }

@@ -31,10 +31,14 @@ const STYLES: { id: StyleId; label: string; category: StyleCategory; desc: strin
   { id: 'linkedin', label: 'LinkedIn', category: 'professional', desc: 'Business casual, fundo claro e nítido.', img: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=400&auto=format&fit=crop' },
   { id: 'profile', label: 'Perfil', category: 'professional', desc: 'Minimalista e moderno para redes sociais.', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop' },
   { id: 'fragmentation', label: 'Fragmentação', category: 'viral', desc: 'Efeito de partículas e estilhaços digitais.', img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop' },
+  { id: 'half_fragmentation', label: 'Meia Desfragmentação', category: 'viral', desc: 'Metade real, metade desintegrando em partículas.', img: 'https://images.unsplash.com/photo-1550684847-75bdda21cc95?q=80&w=400&auto=format&fit=crop' },
   { id: 'dual_concept', label: 'Dualidade', category: 'creative', desc: 'Divisão artística entre real e digital.', img: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=400&auto=format&fit=crop' },
   { id: 'cinematic_aura', label: 'Aura Cinema', category: 'viral', desc: 'Fumaça e iluminação dramática de cinema.', img: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=400&auto=format&fit=crop' },
   { id: 'futuristic', label: 'Futurista', category: 'futurist', desc: 'Neon e tecnologia do futuro.', img: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=400&auto=format&fit=crop' },
   { id: 'minimalist', label: 'Minimalista', category: 'creative', desc: 'Foco total no rosto e silhueta.', img: 'https://images.unsplash.com/photo-1552168324-d612d77725e3?q=80&w=400&auto=format&fit=crop' },
+  { id: 'cyber_glitch', label: 'Cyber Glitch', category: 'viral', desc: 'Distorção digital e arte cyberpunk.', img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=400&auto=format&fit=crop' },
+  { id: 'oil_painting', label: 'Pintura a Óleo', category: 'creative', desc: 'Estilo clássico de pintura renascentista.', img: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=400&auto=format&fit=crop' },
+  { id: 'sketch_art', label: 'Esboço Realista', category: 'creative', desc: 'Desenho artístico feito à mão.', img: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=400&auto=format&fit=crop' },
 ];
 
 export default function App() {
@@ -786,15 +790,28 @@ export default function App() {
           <motion.div 
             initial={{ y: 100 }}
             animate={{ y: 0 }}
-            className="bg-red-500 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-between gap-4"
+            className={`${error.startsWith('QUOTA_EXCEEDED') ? 'bg-amber-600' : 'bg-red-500'} text-white p-4 rounded-2xl shadow-2xl flex items-center justify-between gap-4`}
           >
             <div className="flex items-center gap-3">
               <AlertCircle size={20} />
-              <p className="text-sm font-medium">{error}</p>
+              <p className="text-sm font-medium">
+                {error.startsWith('QUOTA_EXCEEDED') ? error.replace('QUOTA_EXCEEDED: ', '') : error}
+              </p>
             </div>
-            <button onClick={() => setError(null)} className="p-1 hover:bg-white/20 rounded">
-              <RefreshCw size={16} />
-            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => {
+                  setError(null);
+                  if (error.startsWith('QUOTA_EXCEEDED')) {
+                    startProcessing();
+                  }
+                }} 
+                className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors flex items-center gap-2 text-xs font-bold uppercase"
+              >
+                <RefreshCw size={14} />
+                {error.startsWith('QUOTA_EXCEEDED') ? 'Tentar Agora' : 'Fechar'}
+              </button>
+            </div>
           </motion.div>
         </div>
       )}

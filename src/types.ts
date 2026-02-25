@@ -2,8 +2,8 @@ export type AppScreen = 'splash' | 'home' | 'upload' | 'processing' | 'result' |
 
 export type StyleId = 
   | 'linkedin' | 'corporate' | 'profile' 
-  | 'fragmentation' | 'dual_concept' | 'cinematic_aura'
-  | 'futuristic' | 'minimalist';
+  | 'fragmentation' | 'half_fragmentation' | 'dual_concept' | 'cinematic_aura'
+  | 'futuristic' | 'minimalist' | 'cyber_glitch' | 'oil_painting' | 'sketch_art';
 
 export type StyleCategory = 'professional' | 'creative' | 'viral' | 'corporate' | 'futurist';
 
