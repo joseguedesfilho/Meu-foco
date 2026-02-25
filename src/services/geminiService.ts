@@ -125,9 +125,17 @@ export class GeminiService {
       return processedBase64;
     } catch (error: any) {
       console.error("Error processing image with Gemini:", error);
-      if (error.message?.includes("safety")) {
+      
+      const errorMessage = error.message || "";
+      
+      if (errorMessage.includes("429") || errorMessage.includes("quota") || errorMessage.includes("RESOURCE_EXHAUSTED")) {
+        throw new Error("Limite de uso atingido. O Google permite apenas algumas gerações por minuto no plano gratuito. Por favor, aguarde 1 minuto e tente novamente.");
+      }
+      
+      if (errorMessage.includes("safety")) {
         throw new Error("A imagem foi bloqueada pelos filtros de segurança. Tente uma foto diferente.");
       }
+      
       throw error;
     }
   }
