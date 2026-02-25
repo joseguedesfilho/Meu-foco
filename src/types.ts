@@ -7,6 +7,8 @@ export type StyleId =
 
 export type StyleCategory = 'professional' | 'creative' | 'viral' | 'corporate' | 'futurist';
 
+export type EffectId = 'none' | 'noir' | 'vintage' | 'soft_glow' | 'cyber_neon' | 'golden_hour';
+
 export interface ProcessedImage {
   id: string;
   originalUrl: string;
@@ -14,9 +16,11 @@ export interface ProcessedImage {
   timestamp: number;
   mode: 'light' | 'medium' | 'premium';
   style: StyleId;
+  effect?: EffectId;
 }
 
 export interface ProcessingOptions {
   intensity: 'light' | 'medium' | 'premium';
   style: StyleId;
+  effect: EffectId;
 }

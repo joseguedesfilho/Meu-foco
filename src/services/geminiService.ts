@@ -25,7 +25,7 @@ export class GeminiService {
   async processImage(
     base64Image: string,
     mimeType: string,
-    options: { intensity: string; style: string }
+    options: { intensity: string; style: string; effect: string }
   ): Promise<string> {
     try {
       const apiKey = this.getApiKey();
@@ -60,22 +60,33 @@ export class GeminiService {
         sketch_art: "Hand-Drawn Sketch. Convert the portrait into a sophisticated pencil and charcoal sketch. Detailed line work, artistic shading, and a paper texture background. Elegant and timeless artistic feel."
       };
 
+      const effectMap = {
+        none: "Natural colors and sharp professional clarity.",
+        noir: "Dramatic Black and White (Noir style). High contrast, deep blacks, and elegant highlights. Classic timeless portrait feel.",
+        vintage: "Vintage Film style. Subtle film grain, slightly desaturated warm tones, and a nostalgic high-end aesthetic (Leica look).",
+        soft_glow: "Dreamy Soft Glow. Subtle light diffusion, glowing highlights, and smooth skin textures. Ethereal and premium vibe.",
+        cyber_neon: "Cyber Neon accents. Reflective blue and magenta light highlights on the subject's face and shoulders. Futuristic and high-energy.",
+        golden_hour: "Golden Hour lighting. Warm, rich sunset tones, long soft shadows, and a beautiful natural glow."
+      };
+
       const prompt = `
-        This is a photo of a person. Your task is to keep the person's FACE, IDENTITY, POSE, and PERSONALITY 100% UNCHANGED while only upgrading the environment and clothing.
+        This is a photo of a person. Your task is to keep the person's FACE, IDENTITY, POSE, EXPRESSION, and PERSONALITY 100% UNCHANGED while only upgrading the environment, clothing, and applying a photographic effect.
         
         CRITICAL RULES FOR AUTHENTICITY:
         1. FACE & IDENTITY: DO NOT modify the face, eyes, nose, mouth, or facial structure. The face must be a pixel-perfect match to the original person.
-        2. POSE & BODY: Keep the person's original pose, posture, and body position exactly as they are in the photo. Do not rotate or move the subject.
-        3. PERSONALITY: Do not "beautify", "smooth", or "filter" the face in a way that changes the person's character, age, or unique vibe.
+        2. EXPRESSION: Keep the original facial expression EXACTLY as it is. Do not add smiles, change the gaze, or alter the mood of the face.
+        3. POSE & BODY: Keep the person's original pose, posture, and body position exactly as they are in the photo. Do not rotate or move the subject.
+        4. PERSONALITY: Do not "beautify", "smooth", or "filter" the face in a way that changes the person's character, age, or unique vibe.
         
-        PROFESSIONAL UPGRADES (Style: ${options.style}, Intensity: ${options.intensity}):
+        PROFESSIONAL UPGRADES (Style: ${options.style}, Intensity: ${options.intensity}, Effect: ${options.effect}):
         1. STYLE LOGIC: ${styleMap[options.style as keyof typeof styleMap]}
         2. INTENSITY LOGIC: ${intensityMap[options.intensity as keyof typeof intensityMap]}
-        3. CLOTHING: Replace or enhance the current outfit with the specified style's attire that fits the original pose perfectly.
-        4. LIGHTING: Apply professional studio lighting (soft box, rim light) as per the intensity level.
-        5. QUALITY: High resolution, sharp focus, and professional color grading.
+        3. EFFECT LOGIC: ${effectMap[options.effect as keyof typeof effectMap]}
+        4. CLOTHING: Replace or enhance the current outfit with the specified style's attire that fits the original pose perfectly.
+        5. LIGHTING: Apply professional studio lighting (soft box, rim light) as per the intensity level and effect.
+        6. QUALITY: High resolution, sharp focus, and professional color grading.
         
-        The goal is to see the EXACT SAME PERSON in their EXACT SAME POSE, but in a much more professional and high-end context.
+        The goal is to see the EXACT SAME PERSON with the EXACT SAME EXPRESSION in their EXACT SAME POSE, but in a much more professional and high-end context with the selected artistic effect.
       `;
 
       const response = await ai.models.generateContent({
@@ -141,11 +152,43 @@ export class GeminiService {
         throw new Error("QUOTA_EXCEEDED: Limite de uso atingido. O Google permite apenas algumas gerações por minuto no plano gratuito. Por favor, aguarde 1 minuto e tente novamente.");
       }
       
+      if (errorMessage.includes("permission") || errorMessage.includes("denied") || errorMessage.includes("not found") || errorMessage.includes("403")) {
+        throw new Error("AUTH_ERROR: Acesso negado à API. Sua chave pode estar incorreta ou sem permissão para este modelo. Tente configurar uma nova chave.");
+      }
+      
       if (errorMessage.includes("safety")) {
         throw new Error("A imagem foi bloqueada pelos filtros de segurança. Tente uma foto diferente.");
       }
       
       throw new Error(errorMessage || "Ocorreu um erro inesperado ao processar a imagem.");
+    }
+  }
+
+  async generateCaptions(style: string): Promise<string[]> {
+    try {
+      const apiKey = this.getApiKey();
+      const ai = new GoogleGenAI({ apiKey });
+      
+      const prompt = `
+        Com base no estilo de foto "${style}", gere 3 opções de legendas curtas e impactantes para redes sociais (LinkedIn e Instagram).
+        As legendas devem ser em Português do Brasil.
+        Formato de saída: Apenas os 3 textos separados por uma linha em branco. Sem números ou introdução.
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: prompt,
+      });
+
+      const text = response.text || "";
+      return text.split('\n\n').filter(t => t.trim().length > 0).slice(0, 3);
+    } catch (error) {
+      console.error("Error generating captions:", error);
+      return [
+        "Nova fase, novo foco. 🚀",
+        "A evolução é constante. #MeuFoco",
+        "Pronto para os próximos desafios. #Professional"
+      ];
     }
   }
 }

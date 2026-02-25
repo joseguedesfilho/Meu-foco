@@ -20,7 +20,10 @@ import {
   Crop,
   Info,
   Share2,
-  Key
+  Key,
+  TrendingUp,
+  Zap,
+  Award
 } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { AppScreen, ProcessedImage, ProcessingOptions } from './types';
@@ -41,19 +44,19 @@ declare global {
   }
 }
 
-const STYLES: { id: StyleId; label: string; category: StyleCategory; desc: string; img: string }[] = [
+const STYLES: { id: StyleId; label: string; category: StyleCategory; desc: string; img: string; badge?: string }[] = [
   { id: 'corporate', label: 'Corporativo', category: 'corporate', desc: 'Terno e gravata, ambiente executivo.', img: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&auto=format&fit=crop' },
-  { id: 'linkedin', label: 'LinkedIn', category: 'professional', desc: 'Business casual, fundo claro e nítido.', img: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=400&auto=format&fit=crop' },
+  { id: 'linkedin', label: 'LinkedIn', category: 'professional', desc: 'Business casual, fundo claro e nítido.', img: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=400&auto=format&fit=crop', badge: 'Popular' },
   { id: 'profile', label: 'Perfil', category: 'professional', desc: 'Minimalista e moderno para redes sociais.', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop' },
-  { id: 'fragmentation', label: 'Fragmentação', category: 'viral', desc: 'Efeito de partículas e estilhaços digitais.', img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop' },
-  { id: 'half_fragmentation', label: 'Meia Desfragmentação', category: 'viral', desc: 'Metade real, metade desintegrando em partículas.', img: 'https://images.unsplash.com/photo-1550684847-75bdda21cc95?q=80&w=400&auto=format&fit=crop' },
+  { id: 'fragmentation', label: 'Fragmentação', category: 'viral', desc: 'Efeito de partículas e estilhaços digitais.', img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop', badge: 'Viral' },
+  { id: 'half_fragmentation', label: 'Meia Desfragmentação', category: 'viral', desc: 'Metade real, metade desintegrando em partículas.', img: 'https://images.unsplash.com/photo-1550684847-75bdda21cc95?q=80&w=400&auto=format&fit=crop', badge: 'Trending' },
   { id: 'dual_concept', label: 'Dualidade', category: 'creative', desc: 'Divisão artística entre real e digital.', img: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=400&auto=format&fit=crop' },
-  { id: 'cinematic_aura', label: 'Aura Cinema', category: 'viral', desc: 'Fumaça e iluminação dramática de cinema.', img: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=400&auto=format&fit=crop' },
+  { id: 'cinematic_aura', label: 'Aura Cinema', category: 'viral', desc: 'Fumaça e iluminação dramática de cinema.', img: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=400&auto=format&fit=crop', badge: 'Novo' },
   { id: 'futuristic', label: 'Futurista', category: 'futurist', desc: 'Neon e tecnologia do futuro.', img: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=400&auto=format&fit=crop' },
   { id: 'minimalist', label: 'Minimalista', category: 'creative', desc: 'Foco total no rosto e silhueta.', img: 'https://images.unsplash.com/photo-1552168324-d612d77725e3?q=80&w=400&auto=format&fit=crop' },
-  { id: 'cyber_glitch', label: 'Cyber Glitch', category: 'viral', desc: 'Distorção digital e arte cyberpunk.', img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=400&auto=format&fit=crop' },
+  { id: 'cyber_glitch', label: 'Cyber Glitch', category: 'viral', desc: 'Distorção digital e arte cyberpunk.', img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=400&auto=format&fit=crop', badge: 'Viral' },
   { id: 'oil_painting', label: 'Pintura a Óleo', category: 'creative', desc: 'Estilo clássico de pintura renascentista.', img: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=400&auto=format&fit=crop' },
-  { id: 'sketch_art', label: 'Esboço Realista', category: 'creative', desc: 'Desenho artístico feito à mão.', img: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=400&auto=format&fit=crop' },
+  { id: 'sketch_art', label: 'Esboço Realista', category: 'creative', desc: 'Desenho artístico feito à mão.', img: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=400&auto=format&fit=crop', badge: 'Novo' },
 ];
 
 export default function App() {
@@ -66,17 +69,42 @@ export default function App() {
   const [processingStep, setProcessingStep] = useState(0);
   const [options, setOptions] = useState<ProcessingOptions>({
     intensity: 'medium',
-    style: 'corporate'
+    style: 'corporate',
+    effect: 'none'
   });
+  const [captions, setCaptions] = useState<string[]>([]);
+  const [isGeneratingCaptions, setIsGeneratingCaptions] = useState(false);
+  const [showCaptions, setShowCaptions] = useState(false);
   const [viewMode, setViewMode] = useState<'slider' | 'side-by-side'>('slider');
   const [zoomImage, setZoomImage] = useState<string | null>(null);
   const [showCropper, setShowCropper] = useState(false);
   const [rawImage, setRawImage] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [hasPersonalKey, setHasPersonalKey] = useState(false);
+  const [showFlash, setShowFlash] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const beforeAfterRef = useRef<HTMLDivElement>(null);
+
+  // Check for personal key on mount
+  useEffect(() => {
+    const checkKey = async () => {
+      if (window.aistudio?.hasSelectedApiKey) {
+        const hasKey = await window.aistudio.hasSelectedApiKey();
+        setHasPersonalKey(hasKey);
+      }
+    };
+    checkKey();
+  }, []);
+
+  const handleKeySelection = async () => {
+    if (window.aistudio?.openSelectKey) {
+      await window.aistudio.openSelectKey();
+      // Assume success as per platform guidelines
+      setHasPersonalKey(true);
+      setError(null);
+    }
+  };
 
   // Load history from localStorage
   useEffect(() => {
@@ -98,26 +126,6 @@ export default function App() {
       console.warn("Failed to save history to localStorage", e);
     }
   }, [history]);
-
-  useEffect(() => {
-    const checkKey = async () => {
-      if (window.aistudio) {
-        const hasKey = await window.aistudio.hasSelectedApiKey();
-        setHasPersonalKey(hasKey);
-      }
-    };
-    checkKey();
-  }, []);
-
-  const handleKeySelection = async () => {
-    if (window.aistudio) {
-      await window.aistudio.openSelectKey();
-      const hasKey = await window.aistudio.hasSelectedApiKey();
-      setHasPersonalKey(hasKey);
-    } else {
-      alert("A configuração de chave pessoal via interface está disponível apenas no ambiente de preview. No Netlify, certifique-se de configurar a variável GEMINI_API_KEY corretamente nas configurações do site.");
-    }
-  };
 
   const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -177,11 +185,17 @@ export default function App() {
         processedUrl: result,
         timestamp: Date.now(),
         mode: options.intensity,
-        style: options.style
+        style: options.style,
+        effect: options.effect
       };
 
       setProcessedImage(result);
       setHistory(prev => [newProcessedImage, ...prev]);
+      
+      // Trigger flash effect
+      setShowFlash(true);
+      setTimeout(() => setShowFlash(false), 500);
+      
       setScreen('result');
     } catch (err: any) {
       setError(err.message || "Ocorreu um erro ao processar a imagem.");
@@ -206,7 +220,24 @@ export default function App() {
     setIsExporting(true);
     try {
       const dataUrl = await toPng(beforeAfterRef.current, { quality: 0.95 });
-      downloadImage(dataUrl, `meu-foco-antes-depois-${Date.now()}.png`);
+      
+      // Try native share first
+      if (navigator.share) {
+        try {
+          const blob = await (await fetch(dataUrl)).blob();
+          const file = new File([blob], 'meu-foco-antes-depois.png', { type: 'image/png' });
+          await navigator.share({
+            files: [file],
+            title: 'Meu Foco AI',
+            text: 'Olha só o meu novo retrato profissional criado com IA no Meu Foco!',
+          });
+        } catch (shareErr) {
+          // Fallback to download if share fails or is cancelled
+          downloadImage(dataUrl, `meu-foco-antes-depois-${Date.now()}.png`);
+        }
+      } else {
+        downloadImage(dataUrl, `meu-foco-antes-depois-${Date.now()}.png`);
+      }
     } catch (err) {
       console.error('Export failed', err);
       setError("Falha ao exportar imagem Antes e Depois.");
@@ -271,21 +302,12 @@ export default function App() {
           </div>
           <span className="font-serif font-bold text-xl">Meu Foco</span>
         </div>
-        <div className="flex items-center gap-2">
-          <button 
-            onClick={handleKeySelection}
-            className={`p-2 rounded-full transition-colors ${hasPersonalKey ? 'bg-gold-500 text-black' : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
-            title={hasPersonalKey ? "Chave Pessoal Ativa" : "Configurar Chave Pessoal"}
-          >
-            <Key size={20} />
-          </button>
-          <button 
-            onClick={() => setScreen('history')}
-            className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors"
-          >
-            <History size={20} />
-          </button>
-        </div>
+        <button 
+          onClick={() => setScreen('history')}
+          className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors"
+        >
+          <History size={20} />
+        </button>
       </header>
 
       <main className="p-6 max-w-2xl mx-auto">
@@ -461,35 +483,53 @@ export default function App() {
             <label className="text-xs uppercase tracking-widest font-bold text-white/50 mb-4 block">Intensidade da IA</label>
             <div className="grid grid-cols-3 gap-3">
               {[
-                { id: 'light', label: 'Leve', desc: 'Natural' },
-                { id: 'medium', label: 'Médio', desc: 'Estúdio' },
-                { id: 'premium', label: 'Premium', desc: 'Elite' }
+                { id: 'light', label: 'Leve', desc: 'Natural', img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop' },
+                { id: 'medium', label: 'Médio', desc: 'Estúdio', img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200&auto=format&fit=crop' },
+                { id: 'premium', label: 'Premium', desc: 'Elite', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop' }
               ].map(mode => (
                 <button
                   key={mode.id}
                   onClick={() => setOptions(prev => ({ ...prev, intensity: mode.id as any }))}
-                  className={`flex flex-col items-center justify-center py-4 px-2 rounded-2xl border-2 transition-all ${
+                  className={`flex flex-col items-center p-1 rounded-2xl border-2 transition-all overflow-hidden ${
                     options.intensity === mode.id 
                       ? 'border-gold-500 bg-gold-500/10 text-gold-300' 
                       : 'border-white/5 bg-white/5 text-white/60 hover:bg-white/10'
                   }`}
                 >
-                  <span className="text-xs font-bold uppercase tracking-widest mb-1">{mode.label}</span>
-                  <span className="text-[9px] opacity-50 uppercase tracking-tighter">{mode.desc}</span>
-                  <div className="flex gap-0.5 mt-2">
-                    {[1, 2, 3].map(dot => (
-                      <div 
-                        key={dot} 
-                        className={`w-1.5 h-1.5 rounded-full ${
-                          (mode.id === 'light' && dot === 1) || 
-                          (mode.id === 'medium' && dot <= 2) || 
-                          (mode.id === 'premium')
-                            ? 'bg-gold-500' 
-                            : 'bg-white/10'
-                        }`} 
-                      />
-                    ))}
+                  <div className="w-full aspect-video rounded-xl overflow-hidden mb-2">
+                    <img src={mode.img} alt={mode.label} className="w-full h-full object-cover opacity-80" />
                   </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">{mode.label}</span>
+                  <span className="text-[8px] opacity-50 uppercase tracking-tighter mb-1">{mode.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs uppercase tracking-widest font-bold text-white/50 mb-4 block">Efeito Fotográfico</label>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
+              {[
+                { id: 'none', label: 'Natural', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop' },
+                { id: 'noir', label: 'Noir', img: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?q=80&w=200&auto=format&fit=crop' },
+                { id: 'vintage', label: 'Vintage', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop' },
+                { id: 'soft_glow', label: 'Glow', img: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=200&auto=format&fit=crop' },
+                { id: 'cyber_neon', label: 'Neon', img: 'https://images.unsplash.com/photo-1520635360276-79f3dbd809f6?q=80&w=200&auto=format&fit=crop' },
+                { id: 'golden_hour', label: 'Golden', img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=200&auto=format&fit=crop' }
+              ].map(effect => (
+                <button
+                  key={effect.id}
+                  onClick={() => setOptions(prev => ({ ...prev, effect: effect.id as any }))}
+                  className={`flex flex-col items-center min-w-[90px] p-1 rounded-2xl border-2 transition-all shrink-0 overflow-hidden ${
+                    options.effect === effect.id 
+                      ? 'border-gold-500 bg-gold-500/10 text-gold-300' 
+                      : 'border-white/5 bg-white/5 text-white/60 hover:bg-white/10'
+                  }`}
+                >
+                  <div className="w-full aspect-square rounded-xl overflow-hidden mb-2">
+                    <img src={effect.img} alt={effect.label} className="w-full h-full object-cover opacity-80" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest mb-1">{effect.label}</span>
                 </button>
               ))}
             </div>
@@ -553,6 +593,16 @@ export default function App() {
                     <div className="aspect-[3/4] overflow-hidden relative">
                       <img src={style.img} alt={style.label} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+                      
+                      {style.badge && (
+                        <div className="absolute top-3 left-3 px-2 py-1 bg-gold-500 text-black text-[8px] font-black uppercase tracking-widest rounded flex items-center gap-1 shadow-lg z-10">
+                          {style.badge === 'Viral' && <Zap size={8} />}
+                          {style.badge === 'Trending' && <TrendingUp size={8} />}
+                          {style.badge === 'Popular' && <Award size={8} />}
+                          {style.badge}
+                        </div>
+                      )}
+
                       <div className="absolute bottom-0 left-0 right-0 p-4">
                         <span className="text-sm font-bold block mb-1">{style.label}</span>
                         <p className="text-[10px] text-white/60 leading-tight line-clamp-2">{style.desc}</p>
@@ -732,6 +782,22 @@ export default function App() {
         </div>
 
         <div className="grid grid-cols-1 gap-4">
+          <Button 
+            variant="outline"
+            onClick={async () => {
+              setIsGeneratingCaptions(true);
+              const caps = await geminiService.generateCaptions(options.style);
+              setCaptions(caps);
+              setIsGeneratingCaptions(false);
+              setShowCaptions(true);
+            }}
+            icon={Sparkles}
+            className="w-full border-blue-500/30 text-blue-400 hover:bg-blue-500/10"
+            disabled={isGeneratingCaptions}
+          >
+            {isGeneratingCaptions ? 'Criando Legendas...' : 'Gerar Legendas para Redes Sociais'}
+          </Button>
+
           <div className="grid grid-cols-2 gap-4">
             <Button 
               variant="outline"
@@ -958,28 +1024,80 @@ export default function App() {
         />
       )}
 
+      {showFlash && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 1, 0] }}
+          transition={{ duration: 0.5 }}
+          className="fixed inset-0 z-[300] bg-white pointer-events-none"
+        />
+      )}
+
+      {showCaptions && (
+        <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <motion.div 
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="w-full max-w-md bg-zinc-900 border border-white/10 rounded-3xl p-6 shadow-2xl"
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-serif font-bold flex items-center gap-2">
+                <Sparkles className="text-blue-400" size={20} />
+                Legendas Sugeridas
+              </h3>
+              <button onClick={() => setShowCaptions(false)} className="p-2 rounded-full bg-white/5">
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              {captions.map((cap, i) => (
+                <div key={i} className="group relative">
+                  <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-sm leading-relaxed text-white/80 pr-12">
+                    {cap}
+                  </div>
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(cap);
+                      alert("Legenda copiada!");
+                    }}
+                    className="absolute top-3 right-3 p-2 bg-blue-500 text-white rounded-xl opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                  >
+                    <Download size={14} className="rotate-[-90deg]" />
+                  </button>
+                </div>
+              ))}
+            </div>
+            
+            <p className="text-[10px] text-white/30 text-center mt-6 uppercase tracking-widest">
+              Clique no ícone para copiar a legenda
+            </p>
+          </motion.div>
+        </div>
+      )}
+
       {error && (
         <div className="fixed bottom-6 left-6 right-6 z-[100]">
           <motion.div 
             initial={{ y: 100 }}
             animate={{ y: 0 }}
-            className={`${error.startsWith('QUOTA_EXCEEDED') ? 'bg-amber-600' : error.startsWith('API_KEY_MISSING') ? 'bg-blue-600' : 'bg-red-500'} text-white p-4 rounded-2xl shadow-2xl flex items-center justify-between gap-4`}
+            className={`${error.startsWith('QUOTA_EXCEEDED') ? 'bg-amber-600' : error.startsWith('AUTH_ERROR') ? 'bg-blue-600' : 'bg-red-500'} text-white p-4 rounded-2xl shadow-2xl flex items-center justify-between gap-4`}
           >
             <div className="flex items-center gap-3">
               <AlertCircle size={20} />
               <p className="text-sm font-medium">
                 {error.startsWith('QUOTA_EXCEEDED') ? error.replace('QUOTA_EXCEEDED: ', '') : 
-                 error.startsWith('API_KEY_MISSING') ? error.replace('API_KEY_MISSING: ', '') : error}
+                 error.startsWith('AUTH_ERROR') ? error.replace('AUTH_ERROR: ', '') : error}
               </p>
             </div>
             <div className="flex items-center gap-2">
-              {(error.startsWith('QUOTA_EXCEEDED') || error.startsWith('API_KEY_MISSING')) && (
+              {(error.startsWith('QUOTA_EXCEEDED') || error.startsWith('AUTH_ERROR')) && (
                 <button 
                   onClick={handleKeySelection}
                   className="p-2 bg-black/20 hover:bg-black/40 rounded-lg transition-colors flex items-center gap-2 text-xs font-bold uppercase border border-white/10"
                 >
                   <Key size={14} />
-                  {error.startsWith('API_KEY_MISSING') ? 'Configurar Agora' : 'Usar Chave Própria'}
+                  {error.startsWith('AUTH_ERROR') ? 'Configurar Chave' : 'Usar Chave Própria'}
                 </button>
               )}
               <button 
