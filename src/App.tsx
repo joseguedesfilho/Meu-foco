@@ -16,14 +16,19 @@ import {
   LayoutGrid,
   Columns,
   X,
-  Trash2
+  Trash2,
+  Crop,
+  Info,
+  Share2
 } from 'lucide-react';
+import { toPng } from 'html-to-image';
 import { AppScreen, ProcessedImage, ProcessingOptions } from './types';
 import { geminiService } from './services/geminiService';
 import { compressImage } from './utils/imageUtils';
 import Button from './components/Button';
 import ImageSlider from './components/ImageSlider';
 import { HistoryCard } from './components/HistoryCard';
+import CropperModal from './components/CropperModal';
 import { StyleId, StyleCategory } from './types';
 
 const STYLES: { id: StyleId; label: string; category: StyleCategory; desc: string; img: string }[] = [
@@ -55,8 +60,12 @@ export default function App() {
   });
   const [viewMode, setViewMode] = useState<'slider' | 'side-by-side'>('slider');
   const [zoomImage, setZoomImage] = useState<string | null>(null);
+  const [showCropper, setShowCropper] = useState(false);
+  const [rawImage, setRawImage] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const beforeAfterRef = useRef<HTMLDivElement>(null);
 
   // Load history from localStorage
   useEffect(() => {
@@ -88,8 +97,8 @@ export default function App() {
       }
       const reader = new FileReader();
       reader.onload = (event) => {
-        setOriginalImage(event.target?.result as string);
-        setScreen('upload');
+        setRawImage(event.target?.result as string);
+        setShowCropper(true);
       };
       reader.onerror = () => {
         setError("Erro ao ler o arquivo selecionado.");
@@ -159,6 +168,20 @@ export default function App() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const exportBeforeAfter = async () => {
+    if (!beforeAfterRef.current) return;
+    setIsExporting(true);
+    try {
+      const dataUrl = await toPng(beforeAfterRef.current, { quality: 0.95 });
+      downloadImage(dataUrl, `meu-foco-antes-depois-${Date.now()}.png`);
+    } catch (err) {
+      console.error('Export failed', err);
+      setError("Falha ao exportar imagem Antes e Depois.");
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const deleteHistoryItem = (id: string) => {
@@ -316,12 +339,46 @@ export default function App() {
           {originalImage && (
             <img src={originalImage} alt="Original" className="w-full h-full object-cover" />
           )}
-          <div className="absolute top-4 right-4 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full text-[10px] uppercase tracking-widest font-bold border border-white/10">
-            Original
+          <div className="absolute top-4 right-4 flex gap-2">
+            <button 
+              onClick={() => setShowCropper(true)}
+              className="px-3 py-1 bg-black/60 backdrop-blur-md rounded-full text-[10px] uppercase tracking-widest font-bold border border-white/10 flex items-center gap-1 hover:bg-gold-500 hover:text-black transition-colors"
+            >
+              <Crop size={12} />
+              Recortar
+            </button>
+            <div className="px-3 py-1 bg-black/60 backdrop-blur-md rounded-full text-[10px] uppercase tracking-widest font-bold border border-white/10">
+              Original
+            </div>
           </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-8">
+          {/* Dicas de Sucesso */}
+          <div className="glass-panel p-4 rounded-2xl border-gold-500/20">
+            <div className="flex items-center gap-2 mb-3 text-gold-400">
+              <Info size={16} />
+              <h3 className="text-xs uppercase tracking-widest font-bold">Dicas de Sucesso</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-start gap-2">
+                <CheckCircle2 size={12} className="text-green-500 mt-0.5 shrink-0" />
+                <span className="text-[10px] text-white/60">Boa iluminação frontal</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 size={12} className="text-green-500 mt-0.5 shrink-0" />
+                <span className="text-[10px] text-white/60">Olhe para a câmera</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <X size={12} className="text-red-500 mt-0.5 shrink-0" />
+                <span className="text-[10px] text-white/60">Evite óculos escuros</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <X size={12} className="text-red-500 mt-0.5 shrink-0" />
+                <span className="text-[10px] text-white/60">Evite fundos poluídos</span>
+              </div>
+            </div>
+          </div>
           <div>
             <div className="flex justify-between items-center mb-4">
               <label className="text-xs uppercase tracking-widest font-bold text-white/50 block">Estilo do Retrato</label>
@@ -486,6 +543,14 @@ export default function App() {
       "Finalizando retrato..."
     ];
 
+    const processingMessages = [
+      "Nossa IA está esculpindo cada detalhe...",
+      "Ajustando as sombras para um visual elite...",
+      "Quase pronto! O resultado será impressionante.",
+      "Preservando sua identidade original...",
+      "Aplicando o estilo selecionado com precisão..."
+    ];
+
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 premium-gradient">
         <div className="relative mb-12">
@@ -500,7 +565,10 @@ export default function App() {
         </div>
 
         <div className="w-full max-w-xs text-center">
-          <h2 className="text-2xl font-serif font-bold mb-6">Criando sua Obra</h2>
+          <h2 className="text-2xl font-serif font-bold mb-2">Criando sua Obra</h2>
+          <p className="text-gold-400/60 text-[10px] uppercase tracking-[0.2em] mb-8 animate-pulse">
+            {processingMessages[processingStep % processingMessages.length]}
+          </p>
           
           <div className="space-y-4">
             {steps.map((step, i) => (
@@ -592,20 +660,70 @@ export default function App() {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        {/* Hidden Before/After for Export */}
+        <div className="fixed -left-[2000px] top-0">
+          <div 
+            ref={beforeAfterRef}
+            className="w-[1080px] h-[1350px] bg-black flex flex-col p-12"
+          >
+            <div className="flex-1 grid grid-cols-2 gap-4">
+              <div className="relative rounded-3xl overflow-hidden">
+                <img src={originalImage || ''} className="w-full h-full object-cover" />
+                <div className="absolute bottom-8 left-8 px-6 py-2 bg-black/60 backdrop-blur-xl rounded-full text-xl font-bold uppercase tracking-widest border border-white/10">Antes</div>
+              </div>
+              <div className="relative rounded-3xl overflow-hidden border-4 border-gold-500">
+                <img src={processedImage || ''} className="w-full h-full object-cover" />
+                <div className="absolute bottom-8 left-8 px-6 py-2 bg-gold-500 text-black rounded-full text-xl font-bold uppercase tracking-widest">Depois</div>
+              </div>
+            </div>
+            <div className="mt-12 flex justify-between items-center">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 bg-gold-500 rounded-2xl flex items-center justify-center">
+                  <Camera size={32} className="text-black" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-serif font-bold">Meu Foco</h1>
+                  <p className="text-gold-400 text-lg uppercase tracking-widest">Portrait Studio AI</p>
+                </div>
+              </div>
+              <p className="text-white/40 text-xl italic">Transforme sua imagem. Eleve sua presença.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-2 gap-4">
+            <Button 
+              variant="outline"
+              onClick={startProcessing}
+              icon={RefreshCw}
+            >
+              Tentar Novamente
+            </Button>
+            <Button 
+              onClick={() => downloadImage(processedImage!, `meu-foco-${Date.now()}.png`)}
+              icon={Download}
+            >
+              Baixar Foto
+            </Button>
+          </div>
+          
           <Button 
             variant="outline"
+            onClick={exportBeforeAfter}
+            icon={Share2}
+            className="w-full border-gold-500/30 text-gold-400 hover:bg-gold-500/10"
+            disabled={isExporting}
+          >
+            {isExporting ? 'Exportando...' : 'Exportar Antes & Depois (Viral)'}
+          </Button>
+
+          <button 
             onClick={() => setScreen('home')}
-            icon={RefreshCw}
+            className="text-center text-white/40 text-xs uppercase tracking-widest py-4 hover:text-white/60 transition-colors"
           >
-            Nova Foto
-          </Button>
-          <Button 
-            onClick={() => downloadImage(processedImage!, `meu-foco-${Date.now()}.png`)}
-            icon={Download}
-          >
-            Download
-          </Button>
+            Voltar ao Início
+          </button>
         </div>
 
         <div className="mt-8 glass-panel p-4 rounded-2xl flex items-start gap-3">
@@ -784,6 +902,21 @@ export default function App() {
           {screen === 'zoom' && renderZoomScreen()}
         </motion.div>
       </AnimatePresence>
+
+      {showCropper && rawImage && (
+        <CropperModal 
+          image={rawImage}
+          onCropComplete={(cropped) => {
+            setOriginalImage(cropped);
+            setShowCropper(false);
+            setScreen('upload');
+          }}
+          onClose={() => {
+            setShowCropper(false);
+            if (!originalImage) setScreen('home');
+          }}
+        />
+      )}
 
       {error && (
         <div className="fixed bottom-6 left-6 right-6 z-[100]">
