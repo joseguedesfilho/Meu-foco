@@ -49,6 +49,8 @@ export class GeminiService {
         corporate: "Formal executive style. Dark suits, white or light blue shirts, and a high-end office or neutral grey studio background.",
         linkedin: "Modern professional networking style. Business casual or smart casual attire with a clean, bright, and approachable studio background.",
         profile: "Creative professional style. Modern textures, clean lines, and a minimalist, high-contrast studio background.",
+        editorial: "High-fashion editorial style. Vogue-like aesthetics, sharp shadows, high contrast, and sophisticated designer clothing.",
+        old_money: "Timeless 'Old Money' elegance. Discrete luxury, blazers, polo shirts, and classic environments like a library or a lush garden.",
         fragmentation: "Modern Fragmentation Effect. The face remains 100% intact and clear. The person's body and clothing physically transform and disintegrate into realistic geometric particles, 3D cubes, or digital shards flutuating in the air. This is a physical transformation of the subject, not an overlay. High impact and evolutionary vibe.",
         half_fragmentation: "Half-Fragmentation Effect. Create a seamless, organic transition from reality to disintegration across the subject. One side remains perfectly realistic. The other side physically dissolves into artistic particles and digital dust. NO harsh vertical lines or visible borders between the two states; the transition must be smooth and blended.",
         dual_concept: "Creative Duality Effect. Artistically blend two concepts across the image. One side is realistic, the other is a conceptual masterpiece (e.g., digital futuristic, smoke dissolving). The transition between the two sides must be SEAMLESS and organic, with NO harsh dividing lines or visible borders.",
@@ -57,7 +59,9 @@ export class GeminiService {
         minimalist: "Ultra-Minimalist Style. Pure white or deep black background, extremely clean lines, and focus entirely on the subject's silhouette and face.",
         cyber_glitch: "Cyber Glitch Art. Apply digital distortion, chromatic aberration, and neon glitch artifacts to the background and clothing. The face remains clear but with subtle digital highlights. High-energy, tech-rebel vibe.",
         oil_painting: "Classical Oil Painting. Transform the entire image into a masterpiece of oil on canvas. Rich textures, visible brushstrokes, and warm, dramatic lighting like a Renaissance portrait. Maintain the person's likeness perfectly.",
-        sketch_art: "Hand-Drawn Sketch. Convert the portrait into a sophisticated pencil and charcoal sketch. Detailed line work, artistic shading, and a paper texture background. Elegant and timeless artistic feel."
+        sketch_art: "Hand-Drawn Sketch. Convert the portrait into a sophisticated pencil and charcoal sketch. Detailed line work, artistic shading, and a paper texture background. Elegant and timeless artistic feel.",
+        pop_art: "Vibrant Pop Art style. Andy Warhol inspired, with bold colors, graphic contrasts, and a modern artistic flair.",
+        double_exposure: "Artistic Double Exposure. Seamlessly blend the person's silhouette with a beautiful urban cityscape or a serene natural landscape. Highly artistic and conceptual."
       };
 
       const effectMap = {
@@ -66,7 +70,9 @@ export class GeminiService {
         vintage: "Vintage Film style. Subtle film grain, slightly desaturated warm tones, and a nostalgic high-end aesthetic (Leica look).",
         soft_glow: "Dreamy Soft Glow. Subtle light diffusion, glowing highlights, and smooth skin textures. Ethereal and premium vibe.",
         cyber_neon: "Cyber Neon accents. Reflective blue and magenta light highlights on the subject's face and shoulders. Futuristic and high-energy.",
-        golden_hour: "Golden Hour lighting. Warm, rich sunset tones, long soft shadows, and a beautiful natural glow."
+        golden_hour: "Golden Hour lighting. Warm, rich sunset tones, long soft shadows, and a beautiful natural glow.",
+        prism_light: "Prism Light effects. Artistic rainbow light diffraction and prismatic flares dancing across the scene.",
+        analog_film: "Authentic Analog Film. Real film grain, organic color shifts, and subtle light leaks for a true cinematic film look."
       };
 
       const prompt = `

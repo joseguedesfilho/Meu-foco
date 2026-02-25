@@ -47,7 +47,9 @@ declare global {
 const STYLES: { id: StyleId; label: string; category: StyleCategory; desc: string; img: string; badge?: string }[] = [
   { id: 'corporate', label: 'Corporativo', category: 'corporate', desc: 'Terno e gravata, ambiente executivo.', img: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&auto=format&fit=crop' },
   { id: 'linkedin', label: 'LinkedIn', category: 'professional', desc: 'Business casual, fundo claro e nítido.', img: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=400&auto=format&fit=crop', badge: 'Popular' },
-  { id: 'profile', label: 'Perfil', category: 'professional', desc: 'Minimalista e moderno para redes sociais.', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop' },
+  { id: 'editorial', label: 'Editorial', category: 'professional', desc: 'Estilo Vogue, sombras marcadas e alta sofisticação.', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&auto=format&fit=crop', badge: 'Luxo' },
+  { id: 'old_money', label: 'Old Money', category: 'professional', desc: 'Elegância discreta, blazers e ambientes luxuosos.', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop' },
+  { id: 'profile', label: 'Perfil', category: 'professional', desc: 'Minimalista e moderno para redes sociais.', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop' },
   { id: 'fragmentation', label: 'Fragmentação', category: 'viral', desc: 'Efeito de partículas e estilhaços digitais.', img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop', badge: 'Viral' },
   { id: 'half_fragmentation', label: 'Meia Desfragmentação', category: 'viral', desc: 'Metade real, metade desintegrando em partículas.', img: 'https://images.unsplash.com/photo-1550684847-75bdda21cc95?q=80&w=400&auto=format&fit=crop', badge: 'Trending' },
   { id: 'dual_concept', label: 'Dualidade', category: 'creative', desc: 'Divisão artística entre real e digital.', img: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=400&auto=format&fit=crop' },
@@ -57,6 +59,8 @@ const STYLES: { id: StyleId; label: string; category: StyleCategory; desc: strin
   { id: 'cyber_glitch', label: 'Cyber Glitch', category: 'viral', desc: 'Distorção digital e arte cyberpunk.', img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=400&auto=format&fit=crop', badge: 'Viral' },
   { id: 'oil_painting', label: 'Pintura a Óleo', category: 'creative', desc: 'Estilo clássico de pintura renascentista.', img: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=400&auto=format&fit=crop' },
   { id: 'sketch_art', label: 'Esboço Realista', category: 'creative', desc: 'Desenho artístico feito à mão.', img: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=400&auto=format&fit=crop', badge: 'Novo' },
+  { id: 'pop_art', label: 'Pop Art', category: 'artistic', desc: 'Estilo Andy Warhol. Cores vibrantes e contraste gráfico.', img: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=400&auto=format&fit=crop', badge: 'Artístico' },
+  { id: 'double_exposure', label: 'Dupla Exposição', category: 'artistic', desc: 'Fusão artística entre o retrato e uma paisagem.', img: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=400&auto=format&fit=crop', badge: 'Novo' },
 ];
 
 export default function App() {
@@ -259,131 +263,212 @@ export default function App() {
   };
 
   const renderSplashScreen = () => (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center premium-gradient">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center premium-gradient overflow-hidden relative">
+      {/* Background Decorative Elements */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gold-500/10 blur-[120px] rounded-full" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-gold-500/10 blur-[120px] rounded-full" />
+      
       <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
+        initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="mb-12"
+        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+        className="mb-12 relative z-10"
       >
-        <div className="w-24 h-24 bg-gold-500 rounded-3xl flex items-center justify-center mb-6 mx-auto shadow-[0_0_50px_rgba(197,141,50,0.4)]">
-          <Camera size={48} className="text-black" />
+        <div className="w-28 h-28 bg-gold-500 rounded-[2rem] flex items-center justify-center mb-8 mx-auto shadow-[0_0_60px_rgba(197,141,50,0.3)] transform rotate-3">
+          <Camera size={56} className="text-black -rotate-3" />
         </div>
-        <h1 className="text-5xl font-serif font-bold mb-2 tracking-tight">Meu Foco</h1>
-        <p className="text-gold-400 font-medium tracking-[0.2em] uppercase text-sm">Portrait Studio AI</p>
+        <h1 className="text-6xl font-serif font-bold mb-3 tracking-tighter">Meu Foco</h1>
+        <div className="flex items-center justify-center gap-3">
+          <div className="h-[1px] w-8 bg-gold-500/30" />
+          <p className="text-gold-400 font-medium tracking-[0.3em] uppercase text-[10px]">Portrait Studio AI</p>
+          <div className="h-[1px] w-8 bg-gold-500/30" />
+        </div>
       </motion.div>
       
       <motion.div
-        initial={{ y: 20, opacity: 0 }}
+        initial={{ y: 30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.5, duration: 0.8 }}
-        className="max-w-xs"
+        transition={{ delay: 0.8, duration: 1 }}
+        className="max-w-xs relative z-10"
       >
-        <p className="text-white/60 mb-10 leading-relaxed italic">
-          “Transforme sua imagem. Eleve sua presença.”
+        <p className="text-white/50 mb-12 leading-relaxed italic font-serif text-lg">
+          “A arte de revelar sua melhor versão profissional.”
         </p>
         <Button 
           onClick={() => setScreen('home')} 
-          className="w-full py-4 text-lg"
+          className="w-full py-5 text-lg rounded-full shadow-2xl shadow-gold-500/20"
           icon={ArrowRight}
         >
-          Começar
+          Entrar no Estúdio
         </Button>
       </motion.div>
     </div>
   );
 
   const renderHomeScreen = () => (
-    <div className="min-h-screen pb-24">
-      <header className="p-6 flex justify-between items-center sticky top-0 bg-black/80 backdrop-blur-lg z-50">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gold-500 rounded-lg flex items-center justify-center">
-            <Camera size={18} className="text-black" />
+    <div className="min-h-screen pb-32 bg-[#050505]">
+      <header className="p-6 flex justify-between items-center sticky top-0 bg-black/60 backdrop-blur-xl z-50 border-b border-white/5">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gold-500 rounded-xl flex items-center justify-center shadow-lg shadow-gold-500/20">
+            <Camera size={22} className="text-black" />
           </div>
-          <span className="font-serif font-bold text-xl">Meu Foco</span>
+          <div>
+            <span className="font-serif font-bold text-xl block leading-none">Meu Foco</span>
+            <span className="text-[8px] uppercase tracking-widest text-gold-500/60 font-bold">Studio AI</span>
+          </div>
         </div>
-        <button 
-          onClick={() => setScreen('history')}
-          className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors"
-        >
-          <History size={20} />
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={handleKeySelection}
+            className={`p-2.5 rounded-full transition-all ${hasPersonalKey ? 'bg-gold-500/20 text-gold-400' : 'bg-white/5 text-white/40 hover:bg-white/10'}`}
+            title="Configurar Chave API"
+          >
+            <Key size={20} />
+          </button>
+          <button 
+            onClick={() => setScreen('history')}
+            className="p-2.5 rounded-full bg-white/5 hover:bg-white/10 transition-all text-white/80"
+          >
+            <History size={20} />
+          </button>
+        </div>
       </header>
 
-      <main className="p-6 max-w-2xl mx-auto">
-        <section className="mb-12">
-          <motion.h2 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-4xl font-serif font-bold mb-4 leading-tight"
-          >
-            Retratos profissionais <br />
-            <span className="gold-text-gradient">em segundos.</span>
-          </motion.h2>
-          <p className="text-white/60 leading-relaxed mb-8">
-            Meu Foco utiliza inteligência artificial para transformar suas fotos comuns em retratos profissionais com aparência de estúdio, mantendo sua identidade.
-          </p>
+      <main className="max-w-4xl mx-auto">
+        {/* Hero Section */}
+        <section className="p-6 pt-12 mb-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gold-500/5 blur-[100px] rounded-full -z-10" />
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            {[
-              { icon: Sparkles, title: "Luz de Estúdio", desc: "Iluminação perfeita" },
-              { icon: ShieldCheck, title: "Identidade", desc: "Fidelidade total" },
-              { icon: CheckCircle2, title: "Fundo Neutro", desc: "Foco em você" }
-            ].map((item, i) => (
-              <div key={i} className="glass-panel p-4 rounded-2xl">
-                <item.icon className="text-gold-400 mb-2" size={20} />
-                <h3 className="font-bold text-sm mb-1">{item.title}</h3>
-                <p className="text-white/40 text-xs">{item.desc}</p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold-500/10 border border-gold-500/20 mb-6">
+              <Sparkles size={12} className="text-gold-400" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-gold-400">Nova Geração v2.5</span>
+            </div>
+            
+            <h2 className="text-5xl md:text-7xl font-serif font-bold mb-6 leading-[0.9] tracking-tighter">
+              Retratos que <br />
+              <span className="gold-text-gradient">abrem portas.</span>
+            </h2>
+            
+            <p className="text-white/50 text-lg leading-relaxed mb-10 max-w-lg">
+              Transforme fotos comuns em retratos de elite. Nossa IA preserva sua identidade enquanto aplica iluminação e estilos de estúdios globais.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button 
+                onClick={() => fileInputRef.current?.click()}
+                className="py-6 px-10 rounded-2xl text-xl shadow-xl shadow-gold-500/10"
+                icon={Upload}
+              >
+                Criar Meu Retrato
+              </Button>
+              <div className="flex items-center gap-4 px-4">
+                <div className="flex -space-x-3">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="w-10 h-10 rounded-full border-2 border-black overflow-hidden">
+                      <img src={`https://picsum.photos/seed/${i+10}/100/100`} alt="User" referrerPolicy="no-referrer" />
+                    </div>
+                  ))}
+                </div>
+                <div className="text-[10px] text-white/40 leading-tight">
+                  <span className="text-white font-bold block">12.4k+</span>
+                  retratos gerados
+                </div>
+              </div>
+            </div>
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileSelect} 
+              accept="image/*" 
+              className="hidden" 
+            />
+          </motion.div>
+        </section>
+
+        {/* Styles Showcase */}
+        <section className="mb-12">
+          <div className="px-6 flex justify-between items-end mb-6">
+            <div>
+              <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-gold-500/60 mb-1">Catálogo de Estilos</h3>
+              <h4 className="text-2xl font-serif font-bold">Explore as Possibilidades</h4>
+            </div>
+            <button className="text-[10px] uppercase tracking-widest font-bold text-white/40 hover:text-gold-400 transition-colors">Ver Todos</button>
+          </div>
+          
+          <div className="flex gap-4 overflow-x-auto px-6 pb-4 scrollbar-hide">
+            {STYLES.filter(s => s.badge).map((style) => (
+              <div 
+                key={style.id}
+                className="min-w-[240px] group cursor-pointer"
+                onClick={() => {
+                  setOptions(prev => ({ ...prev, style: style.id }));
+                  fileInputRef.current?.click();
+                }}
+              >
+                <div className="relative aspect-[3/4] rounded-3xl overflow-hidden mb-3">
+                  <img 
+                    src={style.img} 
+                    alt={style.label} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  <div className="absolute top-4 right-4">
+                    <span className="px-3 py-1 bg-gold-500 text-black text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg">
+                      {style.badge}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <p className="text-white font-serif font-bold text-xl mb-1">{style.label}</p>
+                    <p className="text-white/60 text-[10px] line-clamp-1 uppercase tracking-widest">{style.category}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
-
-          <Button 
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full py-6 rounded-2xl text-xl"
-            icon={Upload}
-          >
-            Enviar Foto
-          </Button>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleFileSelect} 
-            accept="image/*" 
-            className="hidden" 
-          />
         </section>
 
-        <section className="mb-12">
-          <h3 className="text-xl font-serif font-bold mb-6 flex items-center gap-2">
-            <LayoutGrid size={20} className="text-gold-500" />
-            Exemplos Reais
-          </h3>
-          <div className="rounded-2xl overflow-hidden aspect-[3/4] border border-white/10 shadow-2xl relative group">
-            <ImageSlider 
-              before="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1000&auto=format&fit=crop" 
-              after="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1000&auto=format&fit=crop" 
-            />
-            <div className="absolute top-4 left-4 z-10 flex gap-2">
-              <div className="px-2 py-1 bg-black/60 backdrop-blur-md rounded text-[8px] uppercase font-bold border border-white/10">Antes</div>
-              <div className="px-2 py-1 bg-gold-500 text-black rounded text-[8px] uppercase font-bold">Depois</div>
-            </div>
-            <div className="absolute inset-0 pointer-events-none border-2 border-gold-500/20 rounded-2xl"></div>
+        {/* Features Grid */}
+        <section className="px-6 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { icon: ShieldCheck, title: "Identidade Intacta", desc: "Seus traços originais são preservados com 100% de fidelidade." },
+              { icon: Zap, title: "Processamento Ultra", desc: "Resultados de estúdio entregues em menos de 30 segundos." },
+              { icon: Award, title: "Qualidade 4K", desc: "Imagens nítidas prontas para grandes formatos e redes sociais." }
+            ].map((item, i) => (
+              <div key={i} className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all group">
+                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-gold-500/10 transition-colors">
+                  <item.icon className="text-gold-400" size={24} />
+                </div>
+                <h3 className="font-bold text-lg mb-2">{item.title}</h3>
+                <p className="text-white/40 text-sm leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
           </div>
-          <p className="text-[10px] text-white/30 mt-4 text-center uppercase tracking-widest">
-            Arraste o controle deslizante para ver a transformação
-          </p>
         </section>
-      </main>
 
-      <footer className="p-8 text-center border-t border-white/5">
-        <button 
-          onClick={() => setScreen('privacy')}
-          className="text-white/30 text-xs hover:text-white/60 transition-colors"
-        >
-          Política de Privacidade & Segurança
-        </button>
-      </footer>
+        {/* Footer Info */}
+        <footer className="px-6 py-12 border-t border-white/5 text-center">
+          <div className="flex items-center justify-center gap-2 mb-4 opacity-40">
+            <Camera size={16} />
+            <span className="font-serif font-bold text-sm">Meu Foco Studio AI</span>
+          </div>
+          <p className="text-[10px] text-white/20 uppercase tracking-[0.3em] mb-4">
+            © 2024 • Inteligência Artificial Brasileira
+          </p>
+          <button 
+            onClick={() => setScreen('privacy')}
+            className="text-white/30 text-[10px] uppercase tracking-widest hover:text-white/60 transition-colors"
+          >
+            Privacidade & Segurança
+          </button>
+        </footer>
+      </main>
     </div>
   );
 
@@ -514,6 +599,8 @@ export default function App() {
                 { id: 'noir', label: 'Noir', img: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?q=80&w=200&auto=format&fit=crop' },
                 { id: 'vintage', label: 'Vintage', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop' },
                 { id: 'soft_glow', label: 'Glow', img: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=200&auto=format&fit=crop' },
+                { id: 'prism_light', label: 'Prisma', img: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=200&auto=format&fit=crop' },
+                { id: 'analog_film', label: 'Filme', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop' },
                 { id: 'cyber_neon', label: 'Neon', img: 'https://images.unsplash.com/photo-1520635360276-79f3dbd809f6?q=80&w=200&auto=format&fit=crop' },
                 { id: 'golden_hour', label: 'Golden', img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=200&auto=format&fit=crop' }
               ].map(effect => (
