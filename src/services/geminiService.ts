@@ -8,18 +8,33 @@ export class GeminiService {
   private getAI() {
     if (this.ai) return this.ai;
     
-    // In Vite, process.env.GEMINI_API_KEY is replaced at build time.
-    // We use a fallback to check both process.env and a direct string check.
+    // In Vite, process.env.GEMINI_API_KEY is replaced at build time via vite.config.ts
     let apiKey: string | undefined;
     
     try {
+      // Primary method: replaced by Vite define plugin
       apiKey = process.env.GEMINI_API_KEY;
     } catch (e) {
-      // process.env might not be available
+      // process.env might not be available in some browser environments
     }
     
+    // Fallback for some build configurations
     if (!apiKey) {
-      throw new Error("Gemini API Key não encontrada. Verifique as configurações do ambiente.");
+      try {
+        apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY;
+      } catch (e) {
+        // import.meta.env might not be available
+      }
+    }
+    
+    if (!apiKey || apiKey === "undefined") {
+      throw new Error(
+        "Gemini API Key não encontrada. \n\n" +
+        "Se você estiver no Netlify/Vercel: \n" +
+        "1. Vá em Site Settings > Environment Variables\n" +
+        "2. Adicione GEMINI_API_KEY com sua chave\n" +
+        "3. FAÇA UM NOVO DEPLOY para aplicar as mudanças."
+      );
     }
     
     this.ai = new GoogleGenAI({ apiKey });
