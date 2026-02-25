@@ -258,26 +258,19 @@ export default function App() {
             <LayoutGrid size={20} className="text-gold-500" />
             Exemplos Reais
           </h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="relative rounded-2xl overflow-hidden aspect-[3/4] glass-panel">
-               <img 
-                 src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000&auto=format&fit=crop" 
-                 alt="Antes" 
-                 className="w-full h-full object-cover opacity-50 grayscale" 
-               />
-               <div className="absolute bottom-3 left-3 px-2 py-1 bg-black/60 backdrop-blur-md rounded text-[8px] uppercase font-bold border border-white/10">Antes</div>
+          <div className="rounded-2xl overflow-hidden aspect-[3/4] border border-white/10 shadow-2xl relative group">
+            <ImageSlider 
+              before="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1000&auto=format&fit=crop" 
+              after="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1000&auto=format&fit=crop" 
+            />
+            <div className="absolute top-4 left-4 z-10 flex gap-2">
+              <div className="px-2 py-1 bg-black/60 backdrop-blur-md rounded text-[8px] uppercase font-bold border border-white/10">Antes</div>
+              <div className="px-2 py-1 bg-gold-500 text-black rounded text-[8px] uppercase font-bold">Depois</div>
             </div>
-            <div className="relative rounded-2xl overflow-hidden aspect-[3/4] border-2 border-gold-500/30">
-               <img 
-                 src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1000&auto=format&fit=crop" 
-                 alt="Depois" 
-                 className="w-full h-full object-cover" 
-               />
-               <div className="absolute bottom-3 left-3 px-2 py-1 bg-gold-500 text-black rounded text-[8px] uppercase font-bold">Depois</div>
-            </div>
+            <div className="absolute inset-0 pointer-events-none border-2 border-gold-500/20 rounded-2xl"></div>
           </div>
           <p className="text-[10px] text-white/30 mt-4 text-center uppercase tracking-widest">
-            Arraste para comparar a transformação completa
+            Arraste o controle deslizante para ver a transformação
           </p>
         </section>
       </main>
@@ -314,46 +307,71 @@ export default function App() {
 
         <div className="space-y-6">
           <div>
-            <label className="text-xs uppercase tracking-widest font-bold text-white/50 mb-3 block">Estilo do Retrato</label>
-            <div className="grid grid-cols-3 gap-2">
+            <label className="text-xs uppercase tracking-widest font-bold text-white/50 mb-4 block">Estilo do Retrato</label>
+            <div className="grid grid-cols-3 gap-3">
               {[
-                { id: 'corporate', label: 'Corporativo' },
-                { id: 'linkedin', label: 'LinkedIn' },
-                { id: 'profile', label: 'Perfil' }
+                { id: 'corporate', label: 'Corporativo', img: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=200&auto=format&fit=crop' },
+                { id: 'linkedin', label: 'LinkedIn', img: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=200&auto=format&fit=crop' },
+                { id: 'profile', label: 'Perfil', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop' }
               ].map(style => (
                 <button
                   key={style.id}
                   onClick={() => setOptions(prev => ({ ...prev, style: style.id as any }))}
-                  className={`py-3 rounded-xl text-sm font-medium border transition-all ${
+                  className={`relative flex flex-col items-center gap-2 p-1 rounded-2xl border-2 transition-all overflow-hidden ${
                     options.style === style.id 
-                      ? 'bg-gold-500/20 border-gold-500 text-gold-300' 
-                      : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                      ? 'border-gold-500 bg-gold-500/10' 
+                      : 'border-white/5 bg-white/5 hover:bg-white/10'
                   }`}
                 >
-                  {style.label}
+                  <div className="w-full aspect-square rounded-xl overflow-hidden">
+                    <img src={style.img} alt={style.label} className="w-full h-full object-cover" />
+                  </div>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider mb-1 ${options.style === style.id ? 'text-gold-400' : 'text-white/40'}`}>
+                    {style.label}
+                  </span>
+                  {options.style === style.id && (
+                    <div className="absolute top-2 right-2 bg-gold-500 text-black rounded-full p-0.5">
+                      <CheckCircle2 size={12} />
+                    </div>
+                  )}
                 </button>
               ))}
             </div>
           </div>
 
           <div>
-            <label className="text-xs uppercase tracking-widest font-bold text-white/50 mb-3 block">Intensidade da IA</label>
-            <div className="grid grid-cols-3 gap-2">
+            <label className="text-xs uppercase tracking-widest font-bold text-white/50 mb-4 block">Intensidade da IA</label>
+            <div className="grid grid-cols-3 gap-3">
               {[
-                { id: 'light', label: 'Leve' },
-                { id: 'medium', label: 'Médio' },
-                { id: 'premium', label: 'Premium' }
+                { id: 'light', label: 'Leve', desc: 'Natural' },
+                { id: 'medium', label: 'Médio', desc: 'Estúdio' },
+                { id: 'premium', label: 'Premium', desc: 'Elite' }
               ].map(mode => (
                 <button
                   key={mode.id}
                   onClick={() => setOptions(prev => ({ ...prev, intensity: mode.id as any }))}
-                  className={`py-3 rounded-xl text-sm font-medium border transition-all ${
+                  className={`flex flex-col items-center justify-center py-4 px-2 rounded-2xl border-2 transition-all ${
                     options.intensity === mode.id 
-                      ? 'bg-gold-500/20 border-gold-500 text-gold-300' 
-                      : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                      ? 'border-gold-500 bg-gold-500/10 text-gold-300' 
+                      : 'border-white/5 bg-white/5 text-white/60 hover:bg-white/10'
                   }`}
                 >
-                  {mode.label}
+                  <span className="text-xs font-bold uppercase tracking-widest mb-1">{mode.label}</span>
+                  <span className="text-[9px] opacity-50 uppercase tracking-tighter">{mode.desc}</span>
+                  <div className="flex gap-0.5 mt-2">
+                    {[1, 2, 3].map(dot => (
+                      <div 
+                        key={dot} 
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          (mode.id === 'light' && dot === 1) || 
+                          (mode.id === 'medium' && dot <= 2) || 
+                          (mode.id === 'premium')
+                            ? 'bg-gold-500' 
+                            : 'bg-white/10'
+                        }`} 
+                      />
+                    ))}
+                  </div>
                 </button>
               ))}
             </div>

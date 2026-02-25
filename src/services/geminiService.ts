@@ -36,6 +36,18 @@ export class GeminiService {
       // Remove data:image/xxx;base64, prefix if present
       const base64Data = base64Image.split(',')[1] || base64Image;
 
+      const intensityMap = {
+        light: "Subtle professional touch-ups. Keep the original lighting mostly intact but clean up the background and clothing slightly.",
+        medium: "Standard high-end studio quality. Apply balanced softbox lighting and replace the outfit with a sharp professional look.",
+        premium: "Elite executive portrait quality. Apply dramatic rim lighting, perfect skin texture preservation, and premium tailored attire for a magazine-cover look."
+      };
+
+      const styleMap = {
+        corporate: "Formal executive style. Dark suits, white or light blue shirts, and a high-end office or neutral grey studio background.",
+        linkedin: "Modern professional networking style. Business casual or smart casual attire with a clean, bright, and approachable studio background.",
+        profile: "Creative professional style. Modern textures, clean lines, and a minimalist, high-contrast studio background."
+      };
+
       const prompt = `
         This is a photo of a person. Your task is to keep the person's FACE, IDENTITY, POSE, and PERSONALITY 100% UNCHANGED while only upgrading the environment and clothing.
         
@@ -44,11 +56,12 @@ export class GeminiService {
         2. POSE & BODY: Keep the person's original pose, posture, and body position exactly as they are in the photo. Do not rotate or move the subject.
         3. PERSONALITY: Do not "beautify", "smooth", or "filter" the face in a way that changes the person's character, age, or unique vibe.
         
-        PROFESSIONAL UPGRADES:
-        1. CLOTHING: Replace or enhance the current outfit with high-end, professional ${options.style} attire (e.g., a well-tailored suit, elegant blazer, or executive shirt) that fits the original pose.
-        2. BACKGROUND: Place the person in a sophisticated studio setting or professional executive office background matching the ${options.style} style.
-        3. LIGHTING: Apply professional studio lighting (soft box, rim light) that falls naturally on the subject.
-        4. QUALITY: High resolution, sharp focus, and professional color grading.
+        PROFESSIONAL UPGRADES (Style: ${options.style}, Intensity: ${options.intensity}):
+        1. STYLE LOGIC: ${styleMap[options.style as keyof typeof styleMap]}
+        2. INTENSITY LOGIC: ${intensityMap[options.intensity as keyof typeof intensityMap]}
+        3. CLOTHING: Replace or enhance the current outfit with the specified style's attire that fits the original pose perfectly.
+        4. LIGHTING: Apply professional studio lighting (soft box, rim light) as per the intensity level.
+        5. QUALITY: High resolution, sharp focus, and professional color grading.
         
         The goal is to see the EXACT SAME PERSON in their EXACT SAME POSE, but in a much more professional and high-end context.
       `;
