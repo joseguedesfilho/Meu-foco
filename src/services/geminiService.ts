@@ -1,35 +1,17 @@
 import { GoogleGenAI } from "@google/genai";
 
 const MODEL_NAME = "gemini-2.5-flash-image";
+const PREMIUM_MODEL = "gemini-3-pro-image-preview";
 
 export class GeminiService {
-  private ai: GoogleGenAI | null = null;
-
-  private getAI() {
-    if (this.ai) return this.ai;
-    
-    // In Vite, process.env.GEMINI_API_KEY is replaced at build time via vite.config.ts
-    let apiKey: string | undefined;
-    
-    try {
-      // Primary method: replaced by Vite define plugin
-      apiKey = process.env.GEMINI_API_KEY;
-    } catch (e) {
-      // process.env might not be available in some browser environments
-    }
-    
-    // Fallback for some build configurations
-    if (!apiKey) {
-      try {
-        apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY;
-      } catch (e) {
-        // import.meta.env might not be available
-      }
-    }
+  private getApiKey(): string {
+    // Check for platform-selected API key first (injected into process.env.API_KEY)
+    // or the standard GEMINI_API_KEY
+    const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
     
     if (!apiKey || apiKey === "undefined") {
       throw new Error(
-        "Gemini API Key não encontrada. \n\n" +
+        "API_KEY_MISSING: Chave API não configurada. \n\n" +
         "Se você estiver no Netlify: \n" +
         "1. Em Site Settings > Environment Variables, adicione GEMINI_API_KEY.\n" +
         "2. Adicione também SECRETS_SCAN_OMIT_KEYS com o valor GEMINI_API_KEY.\n" +
@@ -37,8 +19,7 @@ export class GeminiService {
       );
     }
     
-    this.ai = new GoogleGenAI({ apiKey });
-    return this.ai;
+    return apiKey;
   }
 
   async processImage(
@@ -47,7 +28,14 @@ export class GeminiService {
     options: { intensity: string; style: string }
   ): Promise<string> {
     try {
-      const ai = this.getAI();
+      const apiKey = this.getApiKey();
+      const ai = new GoogleGenAI({ apiKey });
+      
+      // Use premium model if a personal key is selected (process.env.API_KEY is present), 
+      // otherwise use standard
+      const isPersonalKey = !!process.env.API_KEY;
+      const modelToUse = isPersonalKey ? PREMIUM_MODEL : MODEL_NAME;
+
       // Remove data:image/xxx;base64, prefix if present
       const base64Data = base64Image.split(',')[1] || base64Image;
 
@@ -91,7 +79,7 @@ export class GeminiService {
       `;
 
       const response = await ai.models.generateContent({
-        model: MODEL_NAME,
+        model: modelToUse,
         contents: {
           parts: [
             {

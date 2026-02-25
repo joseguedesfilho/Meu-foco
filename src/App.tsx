@@ -19,7 +19,8 @@ import {
   Trash2,
   Crop,
   Info,
-  Share2
+  Share2,
+  Key
 } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { AppScreen, ProcessedImage, ProcessingOptions } from './types';
@@ -30,6 +31,15 @@ import ImageSlider from './components/ImageSlider';
 import { HistoryCard } from './components/HistoryCard';
 import CropperModal from './components/CropperModal';
 import { StyleId, StyleCategory } from './types';
+
+declare global {
+  interface Window {
+    aistudio?: {
+      hasSelectedApiKey: () => Promise<boolean>;
+      openSelectKey: () => Promise<void>;
+    };
+  }
+}
 
 const STYLES: { id: StyleId; label: string; category: StyleCategory; desc: string; img: string }[] = [
   { id: 'corporate', label: 'Corporativo', category: 'corporate', desc: 'Terno e gravata, ambiente executivo.', img: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&auto=format&fit=crop' },
@@ -63,6 +73,7 @@ export default function App() {
   const [showCropper, setShowCropper] = useState(false);
   const [rawImage, setRawImage] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [hasPersonalKey, setHasPersonalKey] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const beforeAfterRef = useRef<HTMLDivElement>(null);
@@ -87,6 +98,26 @@ export default function App() {
       console.warn("Failed to save history to localStorage", e);
     }
   }, [history]);
+
+  useEffect(() => {
+    const checkKey = async () => {
+      if (window.aistudio) {
+        const hasKey = await window.aistudio.hasSelectedApiKey();
+        setHasPersonalKey(hasKey);
+      }
+    };
+    checkKey();
+  }, []);
+
+  const handleKeySelection = async () => {
+    if (window.aistudio) {
+      await window.aistudio.openSelectKey();
+      const hasKey = await window.aistudio.hasSelectedApiKey();
+      setHasPersonalKey(hasKey);
+    } else {
+      alert("A configuração de chave pessoal via interface está disponível apenas no ambiente de preview. No Netlify, certifique-se de configurar a variável GEMINI_API_KEY corretamente nas configurações do site.");
+    }
+  };
 
   const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -240,12 +271,21 @@ export default function App() {
           </div>
           <span className="font-serif font-bold text-xl">Meu Foco</span>
         </div>
-        <button 
-          onClick={() => setScreen('history')}
-          className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors"
-        >
-          <History size={20} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={handleKeySelection}
+            className={`p-2 rounded-full transition-colors ${hasPersonalKey ? 'bg-gold-500 text-black' : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
+            title={hasPersonalKey ? "Chave Pessoal Ativa" : "Configurar Chave Pessoal"}
+          >
+            <Key size={20} />
+          </button>
+          <button 
+            onClick={() => setScreen('history')}
+            className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors"
+          >
+            <History size={20} />
+          </button>
+        </div>
       </header>
 
       <main className="p-6 max-w-2xl mx-auto">
@@ -923,15 +963,25 @@ export default function App() {
           <motion.div 
             initial={{ y: 100 }}
             animate={{ y: 0 }}
-            className={`${error.startsWith('QUOTA_EXCEEDED') ? 'bg-amber-600' : 'bg-red-500'} text-white p-4 rounded-2xl shadow-2xl flex items-center justify-between gap-4`}
+            className={`${error.startsWith('QUOTA_EXCEEDED') ? 'bg-amber-600' : error.startsWith('API_KEY_MISSING') ? 'bg-blue-600' : 'bg-red-500'} text-white p-4 rounded-2xl shadow-2xl flex items-center justify-between gap-4`}
           >
             <div className="flex items-center gap-3">
               <AlertCircle size={20} />
               <p className="text-sm font-medium">
-                {error.startsWith('QUOTA_EXCEEDED') ? error.replace('QUOTA_EXCEEDED: ', '') : error}
+                {error.startsWith('QUOTA_EXCEEDED') ? error.replace('QUOTA_EXCEEDED: ', '') : 
+                 error.startsWith('API_KEY_MISSING') ? error.replace('API_KEY_MISSING: ', '') : error}
               </p>
             </div>
             <div className="flex items-center gap-2">
+              {(error.startsWith('QUOTA_EXCEEDED') || error.startsWith('API_KEY_MISSING')) && (
+                <button 
+                  onClick={handleKeySelection}
+                  className="p-2 bg-black/20 hover:bg-black/40 rounded-lg transition-colors flex items-center gap-2 text-xs font-bold uppercase border border-white/10"
+                >
+                  <Key size={14} />
+                  {error.startsWith('API_KEY_MISSING') ? 'Configurar Agora' : 'Usar Chave Própria'}
+                </button>
+              )}
               <button 
                 onClick={() => {
                   setError(null);
