@@ -60,7 +60,12 @@ export class GeminiService {
       const styleMap = {
         corporate: "Formal executive style. Dark suits, white or light blue shirts, and a high-end office or neutral grey studio background.",
         linkedin: "Modern professional networking style. Business casual or smart casual attire with a clean, bright, and approachable studio background.",
-        profile: "Creative professional style. Modern textures, clean lines, and a minimalist, high-contrast studio background."
+        profile: "Creative professional style. Modern textures, clean lines, and a minimalist, high-contrast studio background.",
+        fragmentation: "Modern Fragmentation Effect. The face remains 100% intact and clear, but the body and background gracefully fragment into geometric particles, 3D cubes, or digital shards flutuating in the air. High impact, powerful, and evolutionary vibe.",
+        dual_concept: "Creative Duality Effect. Artistically split the image vertically. One side is realistic, the other side is a conceptual masterpiece (e.g., digital futuristic, smoke dissolving, or neon light). Deep, mysterious, and strategic vibe.",
+        cinematic_aura: "Cinematic Aura Style. Dark, moody background with dramatic rim lighting. Subtle smoke or fog enveloping the subject. High authority and strong personal brand presence. Cinema-grade color grading.",
+        futuristic: "Futuristic Tech Style. Cybernetic accents in the background, neon highlights, and a high-tech laboratory or sci-fi city environment.",
+        minimalist: "Ultra-Minimalist Style. Pure white or deep black background, extremely clean lines, and focus entirely on the subject's silhouette and face."
       };
 
       const prompt = `

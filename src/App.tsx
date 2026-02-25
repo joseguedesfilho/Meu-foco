@@ -24,6 +24,18 @@ import { compressImage } from './utils/imageUtils';
 import Button from './components/Button';
 import ImageSlider from './components/ImageSlider';
 import { HistoryCard } from './components/HistoryCard';
+import { StyleId, StyleCategory } from './types';
+
+const STYLES: { id: StyleId; label: string; category: StyleCategory; desc: string; img: string }[] = [
+  { id: 'corporate', label: 'Corporativo', category: 'corporate', desc: 'Terno e gravata, ambiente executivo.', img: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&auto=format&fit=crop' },
+  { id: 'linkedin', label: 'LinkedIn', category: 'professional', desc: 'Business casual, fundo claro e nítido.', img: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=400&auto=format&fit=crop' },
+  { id: 'profile', label: 'Perfil', category: 'professional', desc: 'Minimalista e moderno para redes sociais.', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop' },
+  { id: 'fragmentation', label: 'Fragmentação', category: 'viral', desc: 'Efeito de partículas e estilhaços digitais.', img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop' },
+  { id: 'dual_concept', label: 'Dualidade', category: 'creative', desc: 'Divisão artística entre real e digital.', img: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=400&auto=format&fit=crop' },
+  { id: 'cinematic_aura', label: 'Aura Cinema', category: 'viral', desc: 'Fumaça e iluminação dramática de cinema.', img: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=400&auto=format&fit=crop' },
+  { id: 'futuristic', label: 'Futurista', category: 'futurist', desc: 'Neon e tecnologia do futuro.', img: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=400&auto=format&fit=crop' },
+  { id: 'minimalist', label: 'Minimalista', category: 'creative', desc: 'Foco total no rosto e silhueta.', img: 'https://images.unsplash.com/photo-1552168324-d612d77725e3?q=80&w=400&auto=format&fit=crop' },
+];
 
 export default function App() {
   const [screen, setScreen] = useState<AppScreen>('splash');
@@ -307,13 +319,18 @@ export default function App() {
 
         <div className="space-y-6">
           <div>
-            <label className="text-xs uppercase tracking-widest font-bold text-white/50 mb-4 block">Estilo do Retrato</label>
+            <div className="flex justify-between items-center mb-4">
+              <label className="text-xs uppercase tracking-widest font-bold text-white/50 block">Estilo do Retrato</label>
+              <button 
+                onClick={() => setScreen('gallery')}
+                className="text-gold-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 hover:text-gold-300 transition-colors"
+              >
+                <LayoutGrid size={12} />
+                Galeria Completa
+              </button>
+            </div>
             <div className="grid grid-cols-3 gap-3">
-              {[
-                { id: 'corporate', label: 'Corporativo', img: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=200&auto=format&fit=crop' },
-                { id: 'linkedin', label: 'LinkedIn', img: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=200&auto=format&fit=crop' },
-                { id: 'profile', label: 'Perfil', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop' }
-              ].map(style => (
+              {STYLES.slice(0, 3).map(style => (
                 <button
                   key={style.id}
                   onClick={() => setOptions(prev => ({ ...prev, style: style.id as any }))}
@@ -393,6 +410,67 @@ export default function App() {
       </main>
     </div>
   );
+
+  const renderGalleryScreen = () => {
+    const categories: { id: StyleCategory; label: string }[] = [
+      { id: 'professional', label: 'Profissional' },
+      { id: 'corporate', label: 'Corporativo' },
+      { id: 'creative', label: 'Criativo' },
+      { id: 'viral', label: 'Viral' },
+      { id: 'futurist', label: 'Futurista' }
+    ];
+
+    return (
+      <div className="min-h-screen flex flex-col">
+        <header className="p-6 flex items-center gap-4 sticky top-0 bg-black/80 backdrop-blur-lg z-50">
+          <button onClick={() => setScreen('upload')} className="p-2 rounded-full bg-white/5">
+            <ChevronLeft size={20} />
+          </button>
+          <h2 className="font-serif font-bold text-xl">Galeria de Estilos</h2>
+        </header>
+
+        <main className="flex-1 p-6 max-w-4xl mx-auto w-full">
+          {categories.map(cat => (
+            <section key={cat.id} className="mb-10">
+              <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-gold-500 mb-6 border-l-2 border-gold-500 pl-4">
+                {cat.label}
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {STYLES.filter(s => s.category === cat.id).map(style => (
+                  <button
+                    key={style.id}
+                    onClick={() => {
+                      setOptions(prev => ({ ...prev, style: style.id }));
+                      setScreen('upload');
+                    }}
+                    className={`group relative flex flex-col rounded-2xl border-2 transition-all overflow-hidden text-left ${
+                      options.style === style.id 
+                        ? 'border-gold-500 bg-gold-500/10' 
+                        : 'border-white/5 bg-white/5 hover:bg-white/10'
+                    }`}
+                  >
+                    <div className="aspect-[3/4] overflow-hidden relative">
+                      <img src={style.img} alt={style.label} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+                      <div className="absolute bottom-0 left-0 right-0 p-4">
+                        <span className="text-sm font-bold block mb-1">{style.label}</span>
+                        <p className="text-[10px] text-white/60 leading-tight line-clamp-2">{style.desc}</p>
+                      </div>
+                    </div>
+                    {options.style === style.id && (
+                      <div className="absolute top-3 right-3 bg-gold-500 text-black rounded-full p-1 shadow-lg">
+                        <CheckCircle2 size={16} />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </section>
+          ))}
+        </main>
+      </div>
+    );
+  };
 
   const renderProcessingScreen = () => {
     const steps = [
@@ -694,6 +772,7 @@ export default function App() {
           {screen === 'splash' && renderSplashScreen()}
           {screen === 'home' && renderHomeScreen()}
           {screen === 'upload' && renderUploadScreen()}
+          {screen === 'gallery' && renderGalleryScreen()}
           {screen === 'processing' && renderProcessingScreen()}
           {screen === 'result' && renderResultScreen()}
           {screen === 'history' && renderHistoryScreen()}

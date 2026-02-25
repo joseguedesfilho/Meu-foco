@@ -1,4 +1,11 @@
-export type AppScreen = 'splash' | 'home' | 'upload' | 'processing' | 'result' | 'history' | 'privacy' | 'zoom';
+export type AppScreen = 'splash' | 'home' | 'upload' | 'processing' | 'result' | 'history' | 'privacy' | 'zoom' | 'gallery';
+
+export type StyleId = 
+  | 'linkedin' | 'corporate' | 'profile' 
+  | 'fragmentation' | 'dual_concept' | 'cinematic_aura'
+  | 'futuristic' | 'minimalist';
+
+export type StyleCategory = 'professional' | 'creative' | 'viral' | 'corporate' | 'futurist';
 
 export interface ProcessedImage {
   id: string;
@@ -6,10 +13,10 @@ export interface ProcessedImage {
   processedUrl: string;
   timestamp: number;
   mode: 'light' | 'medium' | 'premium';
-  style: 'linkedin' | 'corporate' | 'profile';
+  style: StyleId;
 }
 
 export interface ProcessingOptions {
   intensity: 'light' | 'medium' | 'premium';
-  style: 'linkedin' | 'corporate' | 'profile';
+  style: StyleId;
 }
